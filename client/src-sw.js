@@ -28,15 +28,17 @@ registerRoute(({ request }) => request.mode === "navigate", pageCache);
 
 // TODO: Implement asset caching
 // Cache CSS and JavaScript
-const matchCallback = ({ request }) => {
-  console.log(request);
-  return request.destination === "style" || request.destination === "script";
-};
+// const matchCallback = ({ request }) => {
+//   console.log(request);
+//   return request.destination === "style" || request.destination === "script";
+// };
 
 registerRoute(
-  matchCallback,
+  ({ request }) => {
+    return ["style", "script", "worker"].includes(request.destination);
+  },
   new StaleWhileRevalidate({
-    cacheName: "static-resources",
+    cacheName: "asset-cache",
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
@@ -46,18 +48,18 @@ registerRoute(
 );
 
 // Cache images
-registerRoute(
-  ({ request }) => request.destination === "image",
-  new CacheFirst({
-    cacheName: "image-cache",
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-      new ExpirationPlugin({
-        maxEntries: 60,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-      }),
-    ],
-  })
-);
+// registerRoute(
+//   ({ request }) => request.destination === "image",
+//   new CacheFirst({
+//     cacheName: "image-cache",
+//     plugins: [
+//       new CacheableResponsePlugin({
+//         statuses: [0, 200],
+//       }),
+//       new ExpirationPlugin({
+//         maxEntries: 60,
+//         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+//       }),
+//     ],
+//   })
+// );
